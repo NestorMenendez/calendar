@@ -21,8 +21,8 @@ export function cleanElement(element: HTMLElement) {
 }
 
 export function setTodayWeekMonthly() {
-    setWeekCalendar();
     showmonthlyCalendar();
+    setWeekCalendar();
 }
 
 export function prevFunction(this: HTMLElement) {

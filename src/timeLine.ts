@@ -2,7 +2,7 @@ import { setWeekCalendar } from "./mainFunctions.js";
 
 
 export function timeLine() {
-
+    const weekContainer = document.querySelector ("#week-container")
     const taskContainers = document.querySelectorAll(".day-task-section");
     const timeLineContainer = document.createElement("div");
     const point = document.createElement("div");
@@ -33,11 +33,13 @@ export function timeLine() {
         const absoluteMinutes = today.getMinutes() / 60;
         const decimalTime = hour + absoluteMinutes;
         timeLineContainer.style.top = `${decimalTime * 6}rem`;
+        console.log(decimalTime)
         if (timeLineContainer.style.top === "0rem") {
             setWeekCalendar();
             clearInterval(lineChecker);
-
         }
     }, 10000);
+
+    // weekContainer?.scrollTo (0, 600);
 
 }
