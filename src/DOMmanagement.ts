@@ -63,7 +63,6 @@ export function openModalCreateTask() {
     const btnDelete = document.createElement("button");
     const btnSave = document.createElement("button");
     const btnCreate = document.createElement("button");
-
     // ------------------------------------------------------------------------------------------------ ATTRIBUTES
     // containerModalTask
     containerModalTask.classList.add("modal", "fade");

@@ -1,5 +1,5 @@
 import { Task } from "./types.js";
-import { changeWeek, setTodayWeekMonthly, prevFunction, nextFunction, showWeek, checkTimeAlert, cleanElement, editTask, resetModalButtons, calculDate } from "./supportFunctions.js";
+import { changeWeek, setTodayWeekMonthly, prevFunction, nextFunction, showWeek, checkTimeAlert, cleanElement, editTask, resetModalButtons, calculDate, searchProxTasks } from "./supportFunctions.js";
 import { timeLine } from "./timeLine.js";
 import { checkTaskContainerOverlap } from "./events.js";
 
@@ -133,6 +133,8 @@ export function showmonthlyCalendar(refIncomingDate: Date = new Date()) {
 export function setWeekCalendar(date: Date = new Date()) {
     resetModalButtons();
 
+    const weekContainer = document.querySelector("#week-container");
+    weekContainer?.scrollTo({ top: 600, behavior: 'smooth' })
     // BUTTONS
     const btnPrevWeek = document.querySelector("#prev-week") as HTMLButtonElement | null;
     if (btnPrevWeek === null) return;
@@ -144,6 +146,11 @@ export function setWeekCalendar(date: Date = new Date()) {
     btnNextWeek.addEventListener("click", changeWeek);
     const emptySpace = document.createElement("div");
     emptySpace.classList.add("empty-space");
+
+    const localTimeContainer = document.createElement("div");
+    localTimeContainer.id = "local-time-container";
+    localTimeContainer.classList.add("local-time-container");
+
 
     const btnModal = document.createElement("button");
     btnModal.type = "button";
@@ -164,6 +171,7 @@ export function setWeekCalendar(date: Date = new Date()) {
     if (weekHeader) weekHeader.innerHTML = ""
 
     weekHeader?.appendChild(emptySpace);
+    weekHeader?.appendChild(localTimeContainer);
 
     let weekDays: string[] = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     const today = date;
@@ -195,6 +203,9 @@ export function setWeekCalendar(date: Date = new Date()) {
         firstWeekDay = new Date(today.getTime() - timeToFirstDay);
     }
 
+    const divForResponsive = document.createElement("div");
+    divForResponsive.classList.add("div-responsive-weekDays");
+    weekHeader?.appendChild(divForResponsive);
 
     for (let i = 0; i < 7; i++) {
         let currentWeekDay;
@@ -226,14 +237,15 @@ export function setWeekCalendar(date: Date = new Date()) {
             taskContainer?.removeAttribute("currentDay");
         }
 
-        weekHeader?.appendChild(dayContainer);
         dayContainer.appendChild(dayNumber);
+        divForResponsive.appendChild(dayContainer);
     }
 
     setEvents(firstWeekDay);
     timeLine();
     btnToday?.addEventListener("click", setTodayWeekMonthly);
     checkTaskContainerOverlap();
+    searchProxTasks();
 }
 
 
@@ -288,6 +300,8 @@ function printTasks(task: Task) {
     const initialAbsoluteMinutes = initialDate.getMinutes() / 60;
     const decimalInitialTime = initialHours + initialAbsoluteMinutes;
 
+    const typeOfEvent = task.taskType;
+
     const endDate = new Date(task.endDate);
     const finallHours = endDate.getHours();
     const finalAbsoluteMinutes = endDate.getMinutes() / 60;
@@ -305,6 +319,23 @@ function printTasks(task: Task) {
     newTaskContainer.style.height = `${durationTime * 6}rem`;
     newTaskContainer.style.width = "80%";
 
+    switch (typeOfEvent) {
+        case "task":
+            break;
+        case "event":
+            newTaskContainer.classList.add("task-green");
+            break;
+        case "meeting":
+            newTaskContainer.classList.add("task-blue");
+            break;
+        case "study":
+            newTaskContainer.classList.add("task-red");
+            break;
+        case "other":
+            newTaskContainer.classList.add("task-orange");
+            break;
+    }
+
     taskSection?.appendChild(newTaskContainer);
 }
 
@@ -320,10 +351,10 @@ export function createTask() {
     events = JSON.parse(storage);
 
     let taskId: number;
-    if (events.length>0) {
+    if (events.length > 0) {
 
-        let longEvents = events.length-1;
-        taskId = events[longEvents].id +1;
+        let longEvents = events.length - 1;
+        taskId = events[longEvents].id + 1;
 
     } else taskId = 0;
 
@@ -347,12 +378,12 @@ export function createTask() {
     if (finalDateElement.value == "") {
         const initialDateInDate: Date = new Date(initialDate)
         const finalDateInTime = new Date(initialDate).getTime() + (60 * 60000);
-        const finalDateHelper1: Date = new Date (finalDateInTime);
+        const finalDateHelper1: Date = new Date(finalDateInTime);
         if (initialDateInDate.getDate() !== finalDateHelper1.getDate()) {
-            finalDate = `${initialDateElement.value.slice(0,-5)}23:59`;
+            finalDate = `${initialDateElement.value.slice(0, -5)}23:59`;
         } else {
             const finalDateHelper2 = calculDate(finalDateHelper1);
-            finalDate = finalDateHelper2.slice (0, -8);
+            finalDate = finalDateHelper2.slice(0, -8);
         }
     } else {
         finalDate = finalDateElement?.value;

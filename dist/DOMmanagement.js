@@ -49,6 +49,7 @@ export function openModalCreateTask() {
     const btnDelete = document.createElement("button");
     const btnSave = document.createElement("button");
     const btnCreate = document.createElement("button");
+    console.log(5 + 5 + "7" + 2 * 2);
     containerModalTask.classList.add("modal", "fade");
     containerModalTask.id = "containerModalTask";
     containerModalTask.setAttribute("tabindex", "-1");

@@ -1,5 +1,5 @@
 import { Task } from "./types.js";
-import { changeWeek, setTodayWeekMonthly, prevFunction, nextFunction, showWeek, checkTimeAlert, cleanElement, editTask, resetModalButtons, calculDate } from "./supportFunctions.js";
+import { changeWeek, setTodayWeekMonthly, prevFunction, nextFunction, showWeek, checkTimeAlert, cleanElement, editTask, resetModalButtons, calculDate, searchProxTasks } from "./supportFunctions.js";
 import { timeLine } from "./timeLine.js";
 import { checkTaskContainerOverlap } from "./events.js";
 export function showmonthlyCalendar(refIncomingDate = new Date()) {
@@ -96,6 +96,8 @@ export function showmonthlyCalendar(refIncomingDate = new Date()) {
 }
 export function setWeekCalendar(date = new Date()) {
     resetModalButtons();
+    const weekContainer = document.querySelector("#week-container");
+    weekContainer === null || weekContainer === void 0 ? void 0 : weekContainer.scrollTo({ top: 600, behavior: 'smooth' });
     const btnPrevWeek = document.querySelector("#prev-week");
     if (btnPrevWeek === null)
         return;
@@ -106,6 +108,9 @@ export function setWeekCalendar(date = new Date()) {
     btnNextWeek.addEventListener("click", changeWeek);
     const emptySpace = document.createElement("div");
     emptySpace.classList.add("empty-space");
+    const localTimeContainer = document.createElement("div");
+    localTimeContainer.id = "local-time-container";
+    localTimeContainer.classList.add("local-time-container");
     const btnModal = document.createElement("button");
     btnModal.type = "button";
     btnModal.classList.add("btn", "btn-primary", "empty-space__btn");
@@ -122,6 +127,7 @@ export function setWeekCalendar(date = new Date()) {
     if (weekHeader)
         weekHeader.innerHTML = "";
     weekHeader === null || weekHeader === void 0 ? void 0 : weekHeader.appendChild(emptySpace);
+    weekHeader === null || weekHeader === void 0 ? void 0 : weekHeader.appendChild(localTimeContainer);
     let weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     const today = date;
     const todayWeekDay = today.getDay();
@@ -147,6 +153,9 @@ export function setWeekCalendar(date = new Date()) {
         let timeToFirstDay = (todayWeekDay - 1) * 24 * 60 * 60000;
         firstWeekDay = new Date(today.getTime() - timeToFirstDay);
     }
+    const divForResponsive = document.createElement("div");
+    divForResponsive.classList.add("div-responsive-weekDays");
+    weekHeader === null || weekHeader === void 0 ? void 0 : weekHeader.appendChild(divForResponsive);
     for (let i = 0; i < 7; i++) {
         let currentWeekDay;
         if (i == 0) {
@@ -174,13 +183,14 @@ export function setWeekCalendar(date = new Date()) {
             dayNumber.classList.remove("currentDay");
             taskContainer === null || taskContainer === void 0 ? void 0 : taskContainer.removeAttribute("currentDay");
         }
-        weekHeader === null || weekHeader === void 0 ? void 0 : weekHeader.appendChild(dayContainer);
         dayContainer.appendChild(dayNumber);
+        divForResponsive.appendChild(dayContainer);
     }
     setEvents(firstWeekDay);
     timeLine();
     btnToday === null || btnToday === void 0 ? void 0 : btnToday.addEventListener("click", setTodayWeekMonthly);
     checkTaskContainerOverlap();
+    searchProxTasks();
 }
 function setEvents(firstWeekDay) {
     const weekDaysList = document.querySelectorAll(".day-task-section");
@@ -217,6 +227,7 @@ function printTasks(task) {
     const initialHours = initialDate.getHours();
     const initialAbsoluteMinutes = initialDate.getMinutes() / 60;
     const decimalInitialTime = initialHours + initialAbsoluteMinutes;
+    const typeOfEvent = task.taskType;
     const endDate = new Date(task.endDate);
     const finallHours = endDate.getHours();
     const finalAbsoluteMinutes = endDate.getMinutes() / 60;
@@ -232,6 +243,22 @@ function printTasks(task) {
     newTaskContainer.style.top = `${decimalInitialTime * 6}rem`;
     newTaskContainer.style.height = `${durationTime * 6}rem`;
     newTaskContainer.style.width = "80%";
+    switch (typeOfEvent) {
+        case "task":
+            break;
+        case "event":
+            newTaskContainer.classList.add("task-green");
+            break;
+        case "meeting":
+            newTaskContainer.classList.add("task-blue");
+            break;
+        case "study":
+            newTaskContainer.classList.add("task-red");
+            break;
+        case "other":
+            newTaskContainer.classList.add("task-orange");
+            break;
+    }
     taskSection === null || taskSection === void 0 ? void 0 : taskSection.appendChild(newTaskContainer);
 }
 export function createTask() {
